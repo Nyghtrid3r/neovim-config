@@ -25,9 +25,6 @@ return {
                 },
             },
         },
-
-        -- Allows extra capabilities provided by nvim-cmp
-        'hrsh7th/cmp-nvim-lsp',
     },
     config = function()
         vim.api.nvim_create_autocmd('LspAttach', {
@@ -119,8 +116,7 @@ return {
         -- By default, Neovim doesn't support everything that is in the LSP specification.
         -- When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
         -- So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
-        local capabilities = vim.lsp.protocol.make_client_capabilities()
-        capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+        local capabilities = require('blink.cmp').get_lsp_capabilities()
 
         -- Enable the following language servers
         --
@@ -130,41 +126,24 @@ return {
         -- - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
         -- - settings (table): Override the default settings passed when initializing the server.
         local servers = {
-            ts_ls = {},
-            ruff = {},
-            pylsp = {
-                settings = {
-                    pylsp = {
-                        plugins = {
-                            pyflakes = { enabled = false },
-                            pycodestyle = { enabled = false },
-                            autopep8 = { enabled = false },
-                            yapf = { enabled = false },
-                            mccabe = { enabled = false },
-                            pylsp_mypy = { enabled = false },
-                            pylsp_black = { enabled = false },
-                            pylsp_isort = { enabled = false },
-                        },
-                    },
-                },
-            },
-            html = { filetypes = { 'html', 'twig', 'hbs' } },
-            cssls = {},
-            tailwindcss = {},
-            dockerls = {},
-            sqlls = {},
-            terraformls = {},
-            jsonls = {},
-            yamlls = {},
+            kotlin_lsp = {},
+            groovyls = {},
+
             clangd = {},
             cmake = {},
+
+            jsonls = {},
+            yamlls = {},
+
             lua_ls = {
                 settings = {
                     Lua = {
                         completion = {
                             callSnippet = 'Replace',
                         },
-                        runtime = { version = 'LuaJIT' },
+                        runtime = {
+                            version = 'LuaJIT',
+                        },
                         workspace = {
                             checkThirdParty = false,
                             library = vim.api.nvim_get_runtime_file('', true),
