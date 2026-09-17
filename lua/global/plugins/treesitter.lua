@@ -7,35 +7,15 @@ return {
     config = function()
         local treesitter = require 'nvim-treesitter'
 
-        local parsers = {
-            -- C / C++
-            'c',
-            'cpp',
-            'cmake',
+        local parsers = require 'global.treesitter.parsers'
 
-            -- JVM / Android / Jenkins
-            'kotlin',
-            'java',
-            'groovy',
+        local ok, local_parsers = pcall(require, 'local.treesitter.parsers')
 
-            -- Neovim
-            'lua',
-            'vim',
-            'vimdoc',
+        if ok then
+            vim.list_extend(parsers, local_parsers)
+        end
 
-            -- Shell
-            'bash',
-            'fish',
-
-            -- Config / data
-            'json',
-            'toml',
-            'yaml',
-
-            -- Documentation
-            'markdown',
-            'markdown_inline',
-        }
+        require('nvim-treesitter').install(parsers)
 
         -- Install missing parsers.
         -- This is a no-op for parsers that are already installed.

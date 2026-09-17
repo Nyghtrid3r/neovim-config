@@ -118,53 +118,20 @@ return {
         -- So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
         local capabilities = require('blink.cmp').get_lsp_capabilities()
 
-        -- Enable the following language servers
-        --
-        -- Add any additional override configuration in the following tables. Available keys are:
-        -- - cmd (table): Override the default command used to start the server
-        -- - filetypes (table): Override the default list of associated filetypes for the server
-        -- - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
-        -- - settings (table): Override the default settings passed when initializing the server.
-        local servers = {
-            kotlin_lsp = {},
-            groovyls = {},
+        local servers = require 'global.lsp.servers'
 
-            clangd = {},
-            cmake = {},
+        local ok, local_servers = pcall(require, 'local.lsp.servers')
 
-            jsonls = {},
-            yamlls = {},
-
-            lua_ls = {
-                settings = {
-                    Lua = {
-                        completion = {
-                            callSnippet = 'Replace',
-                        },
-                        runtime = {
-                            version = 'LuaJIT',
-                        },
-                        workspace = {
-                            checkThirdParty = false,
-                            library = vim.api.nvim_get_runtime_file('', true),
-                        },
-                        diagnostics = {
-                            globals = { 'vim' },
-                            disable = { 'missing-fields' },
-                        },
-                        format = {
-                            enable = false,
-                        },
-                    },
-                },
-            },
-        }
+        if ok then
+            servers = vim.tbl_deep_extend('force', servers, local_servers)
+        end
 
         -- Ensure the servers and tools above are installed
         local ensure_installed = vim.tbl_keys(servers or {})
         vim.list_extend(ensure_installed, {
             'stylua', -- Used to format Lua code
         })
+
         require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
         for server, cfg in pairs(servers) do
